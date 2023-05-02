@@ -52,7 +52,7 @@ internal class Program
                 colors[i] = color;
             
             stopwatch.Stop();
-            Console.WriteLine($" Loop:{loopCount} R:{color.r} G:{color.g} B:{color.b} {stopwatch.Elapsed.TotalMilliseconds}ms");
+            Console.WriteLine($" Loop:{loopCount,-5} R:{color.r,-3} G:{color.g,-3} B:{color.b,-3} {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             loopCount++;
             ColorsHaveUpdated = true;
