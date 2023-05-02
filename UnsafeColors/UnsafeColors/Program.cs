@@ -20,8 +20,8 @@ internal class Program
         Color[] colors = new Color[WID * HGT];
 
         // Load the test image data into the color array
-        DemoWindowsBitmapByteArray(ref colors);
-        DemoImageSharpByteArray(ref colors);
+        DemoSystemDrawing(ref colors);
+        DemoImageSharp(ref colors);
 
         // Spawn the Raylib thrad with a pointer to the color array
         Thread rayThread = new(() =>
@@ -43,10 +43,17 @@ internal class Program
         while (rayThread.IsAlive)
         {
             Console.ReadKey();
+
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+
             Color color = new(random.Next(255), random.Next(255), random.Next(255), 255);
-            Console.WriteLine($" {loopCount} {color.r} {color.g} {color.b}");
             for (int i = 0; i < WID * HGT; i++)
                 colors[i] = color;
+            
+            stopwatch.Stop();
+            Console.WriteLine($" Loop:{loopCount} R:{color.r} G:{color.g} B:{color.b} {stopwatch.Elapsed.TotalMilliseconds}ms");
+
             loopCount++;
             ColorsHaveUpdated = true;
         }
@@ -73,16 +80,16 @@ internal class Program
         CloseWindow();
     }
 
-    private static void DemoWindowsBitmapByteArray(ref Color[] colors)
+    private static void DemoSystemDrawing(ref Color[] colors)
     {
-        Stopwatch stopwatch = new();
-        stopwatch.Start();
-
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+
             Bitmap bitmap = new("test.png");
             BitmapData bmpData = bitmap.LockBits
-                (new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), 
+                (new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
                 ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
             int numBytes = bmpData.Stride * bitmap.Height;
             byte[] bytes = new byte[numBytes];
@@ -90,14 +97,15 @@ internal class Program
             Marshal.Copy(ptr, bytes, 0, numBytes);
             for (int i = 0; i < bytes.Length; i += 4)
                 colors[i / 4] = new(bytes[i + 2], bytes[i + 1], bytes[i], byte.MaxValue);
-        }
-        Console.WriteLine("OS platform not supported");
 
-        stopwatch.Stop();
-        Console.WriteLine($"System.Drawing took {stopwatch.Elapsed.TotalMilliseconds}ms");
+            stopwatch.Stop();
+            Console.WriteLine($"System.Drawing took {stopwatch.Elapsed.TotalMilliseconds}ms");
+        }
+        else
+            Console.WriteLine("OS platform not supported");
     }
 
-    private static void DemoImageSharpByteArray(ref Color[] colors)
+    private static void DemoImageSharp(ref Color[] colors)
     {
         Stopwatch stopwatch = new();
         stopwatch.Start();
