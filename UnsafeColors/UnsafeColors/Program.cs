@@ -1,5 +1,10 @@
 ﻿using Raylib_CsLo;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using static Raylib_CsLo.Raylib;
+using Color = Raylib_CsLo.Color;
+using Image = Raylib_CsLo.Image;
 
 internal class Program
 {
@@ -9,8 +14,11 @@ internal class Program
     [STAThread]
     private static void Main(string[] args)
     {
-        Random random = new();
         Color[] colors = new Color[WID * HGT];
+
+        byte[] bytes = DemoWindowsBitmapByteArray();
+        for (int i = 0; i < bytes.Length; i += 4)
+            colors[i / 4] = new(bytes[i + 2], bytes[i + 1], bytes[i], byte.MaxValue);
 
         Thread rayThread = new(() =>
         {
@@ -25,6 +33,7 @@ internal class Program
         rayThread.Start();
 
         int loopCount = 0;
+        Random random = new();
         Console.WriteLine("Press any key to change the color!");
         while (rayThread.IsAlive)
         {
@@ -59,5 +68,23 @@ internal class Program
             EndDrawing();
         }
         CloseWindow();
+    }
+
+    private static byte[] DemoWindowsBitmapByteArray()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            Bitmap bitmap = new("test.png");
+            BitmapData bmpData = bitmap.LockBits
+                (new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), 
+                ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+            int numbytes = bmpData.Stride * bitmap.Height;
+            byte[] bytedata = new byte[numbytes];
+            IntPtr ptr = bmpData.Scan0;
+            Marshal.Copy(ptr, bytedata, 0, numbytes);
+            return bytedata;
+        }
+        Console.WriteLine("Not supported");
+        return new byte[WID * HGT];
     }
 }
