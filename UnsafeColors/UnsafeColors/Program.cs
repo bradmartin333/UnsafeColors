@@ -9,9 +9,10 @@ internal class Program
     [STAThread]
     private static void Main(string[] args)
     {
+        Random random = new();
         Color[] colors = new Color[WID * HGT];
 
-        new Thread(() =>
+        Thread rayThread = new(() =>
         {
             unsafe
             {
@@ -20,9 +21,26 @@ internal class Program
                     RayLoop(colorPtr);
                 }
             }
-        }).Start();
+        });
+        rayThread.Start();
 
-
+        int loopCount = 0;
+        Console.WriteLine("Press any key to change the color!");
+        while (rayThread.IsAlive)
+        {
+            Console.ReadKey();
+            Color color = new(random.Next(255), random.Next(255), random.Next(255), 255);
+            Console.WriteLine($" {loopCount} {color.r} {color.g} {color.b}");
+            for (int i = 0; i < WID; i++)
+            {
+                for (int j = 0; j < HGT; j++)
+                {
+                    int colorIdx = i * WID + j;
+                    colors[colorIdx] = color;
+                }
+            }
+            loopCount++;
+        }
     }
 
     unsafe private static void RayLoop(Color* ptr)
