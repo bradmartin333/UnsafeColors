@@ -10,16 +10,20 @@ internal class Program
 {
     private const int WID = 500;
     private const int HGT = 500;
+    private static bool ColorsHaveUpdated = true;
 
     [STAThread]
     private static void Main(string[] args)
     {
+        // This is the Raylib color array that will be updated
         Color[] colors = new Color[WID * HGT];
 
+        // Load the test image data into the color array
         byte[] bytes = DemoWindowsBitmapByteArray();
         for (int i = 0; i < bytes.Length; i += 4)
             colors[i / 4] = new(bytes[i + 2], bytes[i + 1], bytes[i], byte.MaxValue);
 
+        // Spawn the Raylib thrad with a pointer to the color array
         Thread rayThread = new(() =>
         {
             unsafe
@@ -32,6 +36,7 @@ internal class Program
         });
         rayThread.Start();
 
+        // Change the contents of the color array on each console key press
         int loopCount = 0;
         Random random = new();
         Console.WriteLine("Press any key to change the color!");
@@ -40,15 +45,10 @@ internal class Program
             Console.ReadKey();
             Color color = new(random.Next(255), random.Next(255), random.Next(255), 255);
             Console.WriteLine($" {loopCount} {color.r} {color.g} {color.b}");
-            for (int i = 0; i < WID; i++)
-            {
-                for (int j = 0; j < HGT; j++)
-                {
-                    int colorIdx = i * WID + j;
-                    colors[colorIdx] = color;
-                }
-            }
+            for (int i = 0; i < WID * HGT; i++)
+                colors[i] = color;
             loopCount++;
+            ColorsHaveUpdated = true;
         }
     }
 
@@ -62,14 +62,21 @@ internal class Program
         while (!WindowShouldClose())
         {
             BeginDrawing();
-            ClearBackground(BLACK);
-            UpdateTexture(texPattern, ptr);
+            if (ColorsHaveUpdated)
+            {
+                UpdateTexture(texPattern, ptr);
+                ColorsHaveUpdated = false;
+            }
             DrawTexture(texPattern, 0, 0, WHITE);
             EndDrawing();
         }
         CloseWindow();
     }
 
+    /// <summary>
+    /// Standard Windows BitmapData extraction
+    /// </summary>
+    /// <returns>32bppRgb byte array of test.png</returns>
     private static byte[] DemoWindowsBitmapByteArray()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -84,7 +91,7 @@ internal class Program
             Marshal.Copy(ptr, bytedata, 0, numbytes);
             return bytedata;
         }
-        Console.WriteLine("Not supported");
+        Console.WriteLine("OS platform not supported");
         return new byte[WID * HGT];
     }
 }
