@@ -74,7 +74,16 @@ internal class Program
             BeginDrawing();
             if (ColorsHaveUpdated)
             {
+                double start = GetTime();
+                for (int i = 0; i < WID; i++)
+                    for (int j = 0; j < HGT; j++)
+                        DrawPixel(i, j, ptr[i * HGT + j]);
+                Console.WriteLine($"DrawPixel      {(GetTime() - start) * 1e3:0.000}ms");
+
+                start = GetTime();
                 UpdateTexture(texPattern, ptr);
+                Console.WriteLine($"UpdateTexture  {(GetTime() - start) * 1e3:0.000}ms");
+
                 ColorsHaveUpdated = false;
             }
             DrawTexture(texPattern, 0, 0, WHITE);
