@@ -1,7 +1,7 @@
 # UnsafeColors
 Updating an image with a Color array pointer using Raylib  
 
-Also comparing the speed of System.Drawing and ImageSharp  
+Also comparing the speed of System.Drawing and ImageSharp. The initialization of the program hinders performance, so the test functions are ran 5 times each.
 
 ![Capture](./Capture.PNG)
 

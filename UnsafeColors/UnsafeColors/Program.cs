@@ -20,8 +20,11 @@ internal class Program
         Color[] colors = new Color[WID * HGT];
 
         // Load the test image data into the color array
-        DemoSystemDrawing(ref colors);
-        DemoImageSharp(ref colors);
+        for (int i = 0; i < 5; i++)
+        {
+            DemoSystemDrawing(ref colors);
+            DemoImageSharp(ref colors);
+        }
 
         // Spawn the Raylib thrad with a pointer to the color array
         Thread rayThread = new(() =>
@@ -52,7 +55,7 @@ internal class Program
                 colors[i] = color;
             
             stopwatch.Stop();
-            Console.WriteLine($" Loop:{loopCount,-5} R:{color.r,-3} G:{color.g,-3} B:{color.b,-3} {stopwatch.Elapsed.TotalMilliseconds}ms");
+            Console.WriteLine($" Loop:{loopCount,-5} R:{color.r,-3} G:{color.g,-3} B:{color.b,-3}     {stopwatch.Elapsed.TotalMilliseconds:0.000}ms");
 
             loopCount++;
             ColorsHaveUpdated = true;
