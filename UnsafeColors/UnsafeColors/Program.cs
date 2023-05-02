@@ -102,7 +102,7 @@ internal class Program
                 colors[i / 4] = new(bytes[i + 2], bytes[i + 1], bytes[i], byte.MaxValue);
 
             stopwatch.Stop();
-            Console.WriteLine($"System.Drawing took {stopwatch.Elapsed.TotalMilliseconds}ms");
+            Console.WriteLine($"System.Drawing {stopwatch.Elapsed.TotalMilliseconds:0.000}ms");
         }
         else
             Console.WriteLine("OS platform not supported");
@@ -120,6 +120,6 @@ internal class Program
             colors[i / 4] = new(bytes[i], bytes[i + 1], bytes[i + 2], byte.MaxValue);
 
         stopwatch.Stop();
-        Console.WriteLine($"ImageSharp took {stopwatch.Elapsed.TotalMilliseconds}ms");
+        Console.WriteLine($"ImageSharp     {stopwatch.Elapsed.TotalMilliseconds:0.000}ms");
     }
 }
